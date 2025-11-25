@@ -46,6 +46,11 @@ dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
+
+    // Removido o BOM para evitar conflito de resolução
+    // implementation(platform("com.google.firebase:firebase-bom:32.7.0"))
+
+    // Core Compose
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.compose.ui)
     implementation(libs.androidx.compose.ui.graphics)
@@ -66,8 +71,9 @@ dependencies {
     implementation("com.google.android.gms:play-services-location:21.3.0")
     implementation("com.google.maps.android:maps-compose:4.4.1")
 
-    // 🔥 FIREBASE AUTHENTICATION (Única e correta)
+    // 🔥 FIREBASE AUTHENTICATION (Com versões explícitas) 🔥
     implementation("com.google.firebase:firebase-auth-ktx:22.3.0")
+    implementation(libs.firebase.firestore)
 
     // Testes
     testImplementation(libs.junit)

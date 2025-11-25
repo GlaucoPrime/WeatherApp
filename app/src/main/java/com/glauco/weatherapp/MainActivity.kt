@@ -33,8 +33,8 @@ import com.glauco.weatherapp.ui.nav.Route
 import com.glauco.weatherapp.ui.CityDialog
 import com.glauco.weatherapp.ui.theme.WeatherAppTheme
 import com.glauco.weatherapp.viewmodel.MainViewModel
-import com.google.firebase.auth.ktx.auth
-import com.google.firebase.ktx.Firebase
+import com.google.firebase.Firebase
+import com.google.firebase.auth.auth
 
 class MainActivity : ComponentActivity() {
     @OptIn(ExperimentalMaterial3Api::class)
