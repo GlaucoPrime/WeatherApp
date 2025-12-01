@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "206041827030",
+    "project_id": "weatherapp-glc",
+    "storage_bucket": "weatherapp-glc.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:206041827030:android:9c5642d8086bc63499eb77",
+        "android_client_info": {
+          "package_name": "com.glauco.weatherapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBxZjhWXS9bfWq8OManUimVqoMee9FjQ1o"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
