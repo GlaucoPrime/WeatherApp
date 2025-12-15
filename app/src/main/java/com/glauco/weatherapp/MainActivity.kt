@@ -15,8 +15,8 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -27,6 +27,7 @@ import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.glauco.weatherapp.db.fb.FBDatabase
+import com.glauco.weatherapp.api.WeatherService // IMPORT OBRIGATÓRIO
 import com.glauco.weatherapp.ui.nav.BottomNavBar
 import com.glauco.weatherapp.ui.nav.BottomNavItem
 import com.glauco.weatherapp.ui.nav.MainNavHost
@@ -35,19 +36,31 @@ import com.glauco.weatherapp.ui.CityDialog
 import com.glauco.weatherapp.ui.theme.WeatherAppTheme
 import com.glauco.weatherapp.viewmodel.MainViewModel
 import com.glauco.weatherapp.viewmodel.MainViewModelFactory
-import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.auth
+import com.google.firebase.ktx.Firebase
 import android.Manifest
+import androidx.compose.material3.Text
+import com.google.firebase.auth.FirebaseAuth
 
 class MainActivity : ComponentActivity() {
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
+            val fbDB = remember { FBDatabase() }
+            // NOVO: Passa 'this' (Contexto da Activity) para o WeatherService
+            val weatherService = remember { WeatherService(this) }
+            val viewModel: MainViewModel = viewModel(
+                factory = MainViewModelFactory(fbDB, weatherService)
+            )
             WeatherAppTheme {
 
                 val fbDB = remember { FBDatabase() }
+                // Correção: Passando 'this' para o construtor do WeatherService (Prática 09)
+                val weatherService = remember { WeatherService(this) }
+                // Correção: Passando o 'weatherService' para o factory
                 val viewModel: MainViewModel = viewModel(
-                    factory = MainViewModelFactory(fbDB)
+                    factory = MainViewModelFactory(fbDB, weatherService)
                 )
 
                 val navController = rememberNavController()
@@ -57,10 +70,23 @@ class MainActivity : ComponentActivity() {
                 val launcher = rememberLauncherForActivityResult(contract =
                     ActivityResultContracts.RequestPermission(), onResult = {} )
 
+                // NOVO: Navegação por ViewModel (Prática 08)
+                LaunchedEffect(viewModel.page) {
+                    navController.navigate(viewModel.page) {
+                        navController.graph.startDestinationRoute?.let {
+                            popUpTo(it) {
+                                saveState = true
+                            }
+                        }
+                        restoreState = true
+                        launchSingleTop = true
+                    }
+                }
+
                 if (showDialog) CityDialog(
                     onDismiss = { showDialog = false },
                     onConfirm = { city ->
-                        if (city.isNotBlank()) viewModel.add(city)
+                        if (city.isNotBlank()) viewModel.addCity(city) // addCity agora recebe apenas 'city' (string)
                         showDialog = false
                     })
 
@@ -89,7 +115,8 @@ class MainActivity : ComponentActivity() {
                             BottomNavItem.ListButton,
                             BottomNavItem.MapButton,
                         )
-                        BottomNavBar(navController, items)
+                        // CORRIGIDO: BottomNavBar agora recebe (viewModel, items)
+                        BottomNavBar(viewModel, items)
                     },
                     floatingActionButton = {
                         if (showButton) {

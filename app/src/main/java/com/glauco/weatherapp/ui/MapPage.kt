@@ -10,6 +10,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.content.ContextCompat
+import androidx.core.content.ContextCompat.getDrawable
+import androidx.core.graphics.drawable.toBitmap
+import androidx.core.graphics.scale
 import com.glauco.weatherapp.viewmodel.MainViewModel
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
@@ -19,6 +22,8 @@ import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
+import com.glauco.weatherapp.R
+import com.glauco.weatherapp.model.Weather
 
 @Composable
 fun MapPage(
@@ -43,15 +48,32 @@ fun MapPage(
         modifier = Modifier.fillMaxSize(),
         cameraPositionState = camPosState,
         onMapClick = {
-            mainViewModel.add("Cidade@${it.latitude}:${it.longitude}", location = it)
+            mainViewModel.addCity(it)
         },
         properties = MapProperties(isMyLocationEnabled = hasLocationPermission),
         uiSettings = MapUiSettings(myLocationButtonEnabled = true)
     ) {
         mainViewModel.cities.forEach {
             if (it.location != null) {
-                Marker( state = MarkerState(position = it.location),
-                    title = it.name, snippet = "${it.location}")
+                val weather = mainViewModel.weather(it.name)
+
+                val image = weather.bitmap ?:
+                getDrawable(context, R.drawable.loading)!!.toBitmap()
+
+                val marker = BitmapDescriptorFactory
+                    .fromBitmap(image.scale(120, 120))
+
+                val desc = if (weather == Weather.LOADING)
+                    "Carregando clima..."
+                else
+                    "${weather.desc} (${weather.temp}°C)" // CORREÇÃO PARA INCLUIR GRAUS
+
+                Marker(
+                    state = MarkerState(position = it.location),
+                    icon = marker,
+                    title = it.name,
+                    snippet = desc
+                )
             }
         }
         Marker(
