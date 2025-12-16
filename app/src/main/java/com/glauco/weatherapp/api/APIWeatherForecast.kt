@@ -2,20 +2,24 @@ package com.glauco.weatherapp.api
 
 import com.glauco.weatherapp.model.Forecast
 
-data class APIWeatherForecast (
+data class APIWeatherForecast(
     var location: APILocation? = null,
-    var current: APICurrentWeather? = null,
+    var current: APIWeather? = null,
     var forecast: APIForecast? = null
 ) {
     fun toForecast(): List<Forecast>? {
-        return forecast?.forecastday?.map { apiForecastDay ->
+        return forecast?.forecastday?.map {
             Forecast(
-                date = apiForecastDay.date ?: "00-00-0000",
-                weather = apiForecastDay.day?.condition?.text ?: "Erro ao carregar!",
-                tempMin = apiForecastDay.day?.mintemp_c ?: -1.0,
-                tempMax = apiForecastDay.day?.maxtemp_c ?: -1.0,
-                imgUrl = ("https:" + apiForecastDay.day?.condition?.icon)
+                date = it.date ?: "00-00-0000",
+                weather = it.day?.condition?.text ?: "Erro carregando!",
+                tempMin = it.day?.mintemp_c ?: -1.0,
+                tempMax = it.day?.maxtemp_c ?: -1.0,
+                imgUrl = "https:" + it.day?.condition?.icon
             )
         }
     }
 }
+
+data class APIForecast(var forecastday: List<APIForecastDay>? = null)
+
+data class APIForecastDay(var date: String? = null, var day: APIWeather? = null)

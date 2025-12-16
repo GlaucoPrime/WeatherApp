@@ -2,11 +2,11 @@ package com.glauco.weatherapp.db.fb
 
 import com.glauco.weatherapp.model.User
 
-class FBUser (
+class FBUser(
     var name: String? = null,
     var email: String? = null
 ) {
-    fun toUser(): User = User(name!!, email!!)
+    fun toUser() = User(name!!, email!!)
 }
 
 fun User.toFBUser(): FBUser {

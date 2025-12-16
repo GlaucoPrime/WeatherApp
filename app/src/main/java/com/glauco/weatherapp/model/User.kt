@@ -1,3 +1,3 @@
 package com.glauco.weatherapp.model
 
-data class User (val name: String, val email: String)
+data class User(val name: String, val email: String)

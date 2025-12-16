@@ -2,14 +2,20 @@ package com.glauco.weatherapp.model
 
 import android.graphics.Bitmap
 
-data class Weather (
+data class Weather(
     val date: String,
     val desc: String,
     val temp: Double,
     val imgUrl: String,
-    var bitmap: Bitmap? = null
+    var bitmap: Bitmap?
 ) {
     companion object {
-        val LOADING = Weather(date = "LOADING", desc = "LOADING", temp = -1.0, imgUrl = "LOADING", bitmap = null)
+        val LOADING = Weather(
+            date = "LOADING",
+            desc = "Carregando clima...",
+            temp = -1.0,
+            imgUrl = "",
+            bitmap = null
+        )
     }
 }

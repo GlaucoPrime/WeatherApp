@@ -3,7 +3,7 @@ package com.glauco.weatherapp.db.fb
 import com.glauco.weatherapp.model.City
 import com.google.android.gms.maps.model.LatLng
 
-class FBCity (
+class FBCity(
     var name: String? = null,
     var lat: Double? = null,
     var lng: Double? = null
@@ -12,7 +12,6 @@ class FBCity (
         val latlng = if (lat != null && lng != null) LatLng(lat!!, lng!!) else null
         return City(name!!, location = latlng)
     }
-
 }
 
 fun City.toFBCity(): FBCity {
@@ -22,4 +21,3 @@ fun City.toFBCity(): FBCity {
     fbCity.lng = this.location?.longitude ?: 0.0
     return fbCity
 }
-

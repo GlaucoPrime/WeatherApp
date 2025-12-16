@@ -15,7 +15,6 @@ sealed interface Route {
     @Serializable
     data object Map : Route
 }
-
 sealed class BottomNavItem(
     val title: String,
     val icon: ImageVector,

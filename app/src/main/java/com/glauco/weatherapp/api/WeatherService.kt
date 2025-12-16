@@ -14,43 +14,16 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 class WeatherService(private val context: Context) {
     private var weatherAPI: WeatherServiceAPI
-    private val imageLoader = ImageLoader.Builder(context).allowHardware(false).build()
+    private val imageLoader = ImageLoader.Builder(context)
+        .allowHardware(false)
+        .build()
 
     init {
-        val retrofitAPI = Retrofit.Builder().baseUrl(WeatherServiceAPI.BASE_URL)
-            .addConverterFactory(GsonConverterFactory.create()).build()
-        weatherAPI = retrofitAPI.create(WeatherServiceAPI::class.java)
-    }
-
-    fun getName(lat: Double, lng: Double, onResponse: (String?) -> Unit) {
-        search("$lat,$lng") { loc -> onResponse(loc?.name) }
-    }
-
-    fun getLocation(name: String, onResponse: (lat: Double?, long: Double?) -> Unit) {
-        search(name) { loc -> onResponse(loc?.lat, loc?.lon) }
-    }
-
-    fun getWeather(name: String, onResponse: (APICurrentWeather?) -> Unit) {
-        val call: Call<APICurrentWeather?> = weatherAPI.weather(name)
-        enqueue(call) { onResponse.invoke(it) }
-    }
-
-    fun getForecast(name: String, onResponse: (APIWeatherForecast?) -> Unit) {
-        val call: Call<APIWeatherForecast?> = weatherAPI.forecast(name)
-        enqueue(call) { onResponse.invoke(it) }
-    }
-
-    fun getBitmap(imgUrl: String, onResponse: (Bitmap?) -> Unit) {
-        val request = ImageRequest.Builder(context)
-            .data(imgUrl).allowHardware(false).target(
-                onSuccess = { drawable ->
-                    val bitmap = (drawable as BitmapDrawable).bitmap
-                    onResponse(bitmap)
-                },
-                onError = { /* handle failure */ }
-            )
+        val retrofitAPI = Retrofit.Builder()
+            .baseUrl(WeatherServiceAPI.BASE_URL)
+            .addConverterFactory(GsonConverterFactory.create())
             .build()
-        imageLoader.enqueue(request)
+        weatherAPI = retrofitAPI.create(WeatherServiceAPI::class.java)
     }
 
     private fun <T> enqueue(call: Call<T?>, onResponse: ((T?) -> Unit)? = null) {
@@ -66,17 +39,43 @@ class WeatherService(private val context: Context) {
         })
     }
 
+    fun getName(lat: Double, lng: Double, onResponse: (String?) -> Unit) {
+        search("$lat,$lng") { loc -> onResponse(loc?.name) }
+    }
+
+    fun getLocation(name: String, onResponse: (lat: Double?, long: Double?) -> Unit) {
+        search(name) { loc -> onResponse(loc?.lat, loc?.lon) }
+    }
+
     private fun search(query: String, onResponse: (APILocation?) -> Unit) {
         val call: Call<List<APILocation>?> = weatherAPI.search(query)
-        call.enqueue(object : Callback<List<APILocation>?> {
-            override fun onResponse(call: Call<List<APILocation>?>, response: Response<List<APILocation>?>) {
-                onResponse(response.body()?.let { if (it.isNotEmpty()) it[0] else null })
-            }
+        enqueue(call) {
+            onResponse(if (it != null && it.isNotEmpty()) it[0] else null)
+        }
+    }
 
-            override fun onFailure(call: Call<List<APILocation>?>, t: Throwable) {
-                Log.w("WeatherApp WARNING", "" + t.message)
-                onResponse(null)
-            }
-        })
+    fun getWeather(name: String, onResponse: (APICurrentWeather?) -> Unit) {
+        val call: Call<APICurrentWeather?> = weatherAPI.weather(name)
+        enqueue(call) { onResponse.invoke(it) }
+    }
+
+    fun getForecast(name: String, onResponse: (APIWeatherForecast?) -> Unit) {
+        val call: Call<APIWeatherForecast?> = weatherAPI.forecast(name)
+        enqueue(call) { onResponse.invoke(it) }
+    }
+
+    fun getBitmap(imgUrl: String, onResponse: (Bitmap?) -> Unit) {
+        val request = ImageRequest.Builder(context)
+            .data(imgUrl)
+            .allowHardware(false)
+            .target(
+                onSuccess = { drawable ->
+                    val bitmap = (drawable as BitmapDrawable).bitmap
+                    onResponse(bitmap)
+                },
+                onError = { }
+            )
+            .build()
+        imageLoader.enqueue(request)
     }
 }

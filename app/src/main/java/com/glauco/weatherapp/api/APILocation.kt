@@ -1,11 +1,7 @@
 package com.glauco.weatherapp.api
 
-data class APILocation (
-    var id: String? = null,
+data class APILocation(
     var name: String? = null,
-    var region: String? = null,
-    var country: String? = null,
     var lat: Double? = null,
-    var lon: Double? = null,
-    var url: String? = null
+    var lon: Double? = null
 )

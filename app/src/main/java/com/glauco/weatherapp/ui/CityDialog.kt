@@ -27,30 +27,25 @@ import androidx.compose.ui.window.Dialog
 @Composable
 fun CityDialog(onDismiss: () -> Unit, onConfirm: (city: String) -> Unit) {
     val cityName = remember { mutableStateOf("") }
-    Dialog(onDismissRequest = { onDismiss() } ) {
-        Surface( shape = RoundedCornerShape(16.dp) ) {
+    Dialog(onDismissRequest = { onDismiss() }) {
+        Surface(shape = RoundedCornerShape(16.dp)) {
             Column(modifier = Modifier.padding(20.dp)) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
-
                 ) {
                     Text(text = "Adicionar cidade favorita:")
-                    Icon(imageVector = Icons.Filled.Close,
+                    Icon(
+                        imageVector = Icons.Filled.Close,
                         contentDescription = "",
-
                         modifier = Modifier.clickable { onDismiss() })
-
                 }
                 Spacer(modifier = Modifier.height(20.dp))
                 OutlinedTextField(
                     modifier = Modifier.fillMaxWidth(),
                     label = { Text(text = "Nome da cidade") },
-
                     value = cityName.value,
-
                     onValueChange = { cityName.value = it })
                 Spacer(modifier = Modifier.height(20.dp))
                 Button(
